@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cancel Ride - Aviro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>Cancel Ride</h2>
+
+  <div class="cancel-box">
+    <!-- Optional fallback -->
+    <input type="number" id="rideIdInput" placeholder="Enter Ride ID (optional)">
+    
+    <button onclick="cancelRide()">Cancel Ride</button>
+  </div>
+
+  <p id="statusMsg"></p>
+
+  <button class="back-btn" onclick="goBack()">← Back to Dashboard</button>
+
+</div>
+
+<script src="auth.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.container {
+  width: 90%;
+  max-width: 500px;
+  margin: auto;
+  margin-top: 60px;
+  text-align: center;
+}
+
+.cancel-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+input {
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #ff416c;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.back-btn {
+  margin-top: 20px;
+  background: #5b86e5;
+}
+</style>
+
+<script>
+
+// ✅ GET rideId FROM URL
+function getRideIdFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("id");
+}
+
+async function cancelRide() {
+
+  const rideIdFromURL = getRideIdFromURL();
+  const rideIdInput = document.getElementById("rideIdInput").value;
+
+  // ✅ Priority: URL → then input
+  const rideId = rideIdFromURL || rideIdInput;
+
+  const token = localStorage.getItem("accessToken");
+
+  if (!rideId) {
+    alert("Ride ID not found");
+    return;
+  }
+
+  if (!token) {
+    alert("Please login first");
+    window.location.href = "login.html";
+    return;
+  }
+
+  try {
+    const url = `https://aviro-production.up.railway.app/api/rides/${rideId}/cancel`;
+
+    console.log("Cancel API:", url);
+
+    const response = await fetchWithAuth(url, {
+      method: "PUT"
+    });
+
+    console.log("Status:", response.status);
+
+    const msg = document.getElementById("statusMsg");
+
+    if (response.ok) {
+      msg.innerText = "✅ Ride cancelled successfully";
+    } 
+    else if (response.status === 403) {
+      msg.innerText = "❌ Access denied (Driver/Both role required)";
+    } 
+    else if (response.status === 404) {
+      msg.innerText = "❌ Ride not found";
+    }
+    else {
+      msg.innerText = "❌ Failed to cancel ride";
+    }
+
+  } catch (error) {
+    console.error(error);
+    document.getElementById("statusMsg").innerText = "❌ Error cancelling ride";
+  }
+}
+
+function goBack() {
+  window.location.href = "dashboard.html";
+}
+
+</script>
+
+</body>
+</html>

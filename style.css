@@ -1,0 +1,209 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+
+/* INTRO SCREEN */
+
+.intro{
+  height:100vh;
+  background: radial-gradient(circle at center, #0b0b0b 0%, #000 80%);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+}
+
+.intro-logo{
+  width:260px;
+  filter: drop-shadow(0 0 25px #00eaff);
+  animation: cinemaZoom 3s ease forwards;
+}
+
+@keyframes cinemaZoom{
+  0%{ transform:scale(.3); opacity:0; }
+  40%{ transform:scale(2.3); opacity:1; }
+  70%{ transform:scale(3.2); }
+  100%{ transform:scale(4.5); }
+}
+
+.fadeOut{
+  animation: fade .4s forwards;
+}
+
+@keyframes fade{
+  to{opacity:0}
+}
+
+
+
+/* BACKGROUND */
+
+.netflix-bg{
+  height:100vh;
+
+  background: linear-gradient(
+      -45deg,
+      #0f172a,
+      #1e293b,
+      #2563eb,
+      #7c3aed,
+      #0f172a
+  );
+
+  background-size:600% 600%;
+  animation: bgMove 10s ease infinite;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+}
+
+@keyframes bgMove{
+  0%{ background-position:0% 50%; }
+  50%{ background-position:100% 50%; }
+  100%{ background-position:0% 50%; }
+}
+
+
+
+/* OVERLAY */
+
+.overlay{
+  position:absolute;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.6);
+  pointer-events: none;
+}
+
+
+/* FORM CARD */
+
+.form-card{
+  position:relative;
+  z-index:2;
+
+  width:340px;
+  padding:35px;
+
+  background:rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.08);
+
+  box-shadow:0 20px 40px rgba(0,0,0,.5);
+
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+
+  color:white;
+}
+
+
+
+/* INPUT */
+
+.form-card input,
+.form-card select{
+  padding:12px;
+  border:none;
+  border-radius:6px;
+
+  background:#1e293b;
+  color:white;
+
+  outline:none;
+  transition:.25s;
+}
+
+.form-card input:focus,
+.form-card select:focus{
+  background:#334155;
+}
+
+
+
+/* BUTTON */
+
+.form-card button{
+  padding:12px;
+  border:none;
+  border-radius:6px;
+
+  background:#3b82f6;
+  color:white;
+  font-weight:500;
+
+  cursor:pointer;
+  transition:.25s;
+}
+
+.form-card button:hover{
+  background:#2563eb;
+  transform:scale(1.04);
+}
+
+
+
+/* TEXT */
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  opacity:.85;
+}
+
+.small{
+  font-size:14px;
+  opacity:.85;
+}
+
+a{
+  color:#60a5fa;
+  text-decoration:none;
+}
+
+a:hover{
+  text-decoration:underline;
+}
+
+
+
+/* BRAND LOGO */
+
+.brand-logo{
+  width:140px;
+  margin-bottom:30px;
+}
+/* === Add Vehicle Button Styling === */
+.neon-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  box-shadow: 0 0 10px rgba(255, 75, 43, 0.6),
+              0 0 20px rgba(255, 65, 108, 0.5);
+
+  transition: all 0.3s ease;
+}
+
+.neon-btn:hover {
+  transform: scale(1.05);
+}

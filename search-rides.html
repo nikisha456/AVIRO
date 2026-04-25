@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Search Rides - Aviro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>Search Rides</h2>
+
+  <!-- SEARCH FORM -->
+  <div class="search-box">
+    <input type="text" id="origin" placeholder="Enter Origin (e.g. Karve)">
+    <input type="text" id="destination" placeholder="Enter Destination (e.g. MIT)">
+    <input type="date" id="date">  <!-- ✅ ALWAYS RETURNS YYYY-MM-DD -->
+
+    <button onclick="searchRides()">Search</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results"></div>
+
+  <!-- BACK BUTTON -->
+  <button class="back-btn" onclick="goBack()">← Back to Dashboard</button>
+
+</div>
+<script src="auth.js"></script>
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.container {
+  width: 90%;
+  max-width: 800px;
+  margin: auto;
+  margin-top: 40px;
+}
+
+h2 {
+  text-align: center;
+}
+
+.search-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+input {
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #5b86e5;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.ride-card {
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.1);
+}
+
+.back-btn {
+  margin-top: 20px;
+  background: #ff416c;
+}
+</style>
+
+<script>
+
+async function searchRides() {
+
+  const origin = document.getElementById("origin").value.trim();
+  const destination = document.getElementById("destination").value.trim();
+  const dateInput = document.getElementById("date").value;
+
+  if (!origin || !destination || !dateInput) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  // ✅ FORCE YYYY-MM-DD FORMAT
+  const d = new Date(dateInput);
+  const formattedDate =
+    d.getFullYear() + "-" +
+    String(d.getMonth() + 1).padStart(2, '0') + "-" +
+    String(d.getDate()).padStart(2, '0');
+
+  // ✅ TOKEN (ANY ROLE WORKS)
+  const token = localStorage.getItem("accessToken");
+
+  const url = `https://aviro-production.up.railway.app/api/rides/search?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&date=${formattedDate}`;
+
+  console.log("API:", url);
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Authorization": "Bearer " + token   // ✅ TOKEN ADDED
+      }
+    });
+
+    console.log("Status:", response.status);
+
+    if (!response.ok) {
+      throw new Error("Error " + response.status);
+    }
+
+    const data = await response.json();
+    const rides = Array.isArray(data) ? data : data.data || [];
+
+    const container = document.getElementById("results");
+    container.innerHTML = "";
+
+    if (rides.length === 0) {
+      container.innerHTML = "<p>No rides found</p>";
+      return;
+    }
+
+    rides.forEach(r => {
+
+  const rideId = r.id || r.rideId;
+
+  const card = document.createElement("div");
+
+  card.innerHTML = `
+    <h4>${r.origin} → ${r.destination}</h4>
+    <button onclick="viewRide(${rideId})">View Details</button>
+
+    <p>Date: ${new Date(r.departureTime).toLocaleDateString()}</p>
+    <p>Time: ${new Date(r.departureTime).toLocaleTimeString()}</p>
+    <p>Seats: ${r.availableSeats}</p>
+    <p>Price: ₹${r.pricePerSeat}</p>
+    <p>Ride ID: ${rideId}</p>
+  `;
+container.appendChild(card);
+});
+    
+
+  } catch (error) {
+    console.error(error);
+    alert("Error fetching rides");
+  }
+}
+
+function goBack() {
+  window.location.href = "dashboard.html";
+}
+function viewRide(id) {
+  console.log("Selected Ride ID:", id);
+  window.location.href = `ride-details.html?id=${id}`;
+}
+</script>
+
+</body>
+</html>
