@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Ride Requests</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>My Ride Requests</h2>
+
+  <div id="requestList"></div>
+
+  <button class="back-btn" onclick="goBack()">← Back</button>
+
+</div>
+
+<script src="auth.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.container {
+  width: 90%;
+  max-width: 800px;
+  margin: auto;
+  margin-top: 40px;
+}
+
+h2 {
+  text-align: center;
+}
+
+.request-card {
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.request-card h4 {
+  margin: 0;
+  color: #00f7ff;
+}
+
+.request-card p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.status {
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.pending {
+  background: orange;
+}
+
+.accepted {
+  background: green;
+}
+
+.rejected {
+  background: red;
+}
+
+.back-btn {
+  margin-top: 20px;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #ff416c;
+  color: white;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.cancel-btn:hover {
+  transform: scale(1.05);
+}
+
+.status-accepted {
+  color: #00ffae;
+  font-weight: bold;
+}
+
+.status-rejected {
+  color: #ff4b2b;
+  font-weight: bold;
+}
+
+.status-pending {
+  color: #ffd166;
+  font-weight: bold;
+}
+
+.status-cancelled {
+  color: #999;
+  font-weight: bold;
+}
+</style>
+
+<script>
+
+
+
+async function loadMyRequests() {
+
+  const token = localStorage.getItem("accessToken");
+
+  if (!token) {
+    alert("Please login first");
+    window.location.href = "login.html";
+    return;
+  }
+
+  try {
+    const response = await fetchWithAuth(
+      "https://aviro-production.up.railway.app/api/ride-requests/my-requests"
+    );
+
+    const data = await response.json();
+
+    console.log("Requests:", data);
+
+    const requests = Array.isArray(data) ? data : data.data || [];
+
+    const container = document.getElementById("requestList");
+    container.innerHTML = "";
+
+    if (requests.length === 0) {
+      container.innerHTML = "<p>No requests found</p>";
+      return;
+    }
+
+    requests.forEach(req => {
+
+  const card = document.createElement("div");
+  card.className = "request-card";
+
+  let statusClass = "";
+  let statusText = "";
+
+  if (req.status === "ACCEPTED") {
+    statusClass = "status-accepted";
+    statusText = "Ride Accepted ";
+  } 
+  else if (req.status === "REJECTED") {
+    statusClass = "status-rejected";
+    statusText = "Ride Rejected ";
+  } 
+  else if (req.status === "CANCELLED") {
+    statusClass = "status-cancelled";
+    statusText = "Cancelled by You 🚫";
+  } 
+  else {
+    statusClass = "status-pending";
+    statusText = "Waiting for Driver ⏳";
+  }
+
+  card.innerHTML = `
+    <h3>${req.origin} → ${req.destination}</h3>
+    <p><b>Driver:</b> ${req.driverName}</p>
+    <p class="${statusClass}"><b>Status:</b> ${statusText}</p>
+
+    ${req.status === "PENDING" ? 
+      `<button class="cancel-btn" onclick="cancelRequest(${req.requestId})">
+        Cancel Request
+      </button>` 
+      : ""
+    }
+  `;
+
+  container.appendChild(card);
+});
+
+  } catch (error) {
+    console.error(error);
+    alert("Error loading requests");
+  }
+}
+
+function goBack() {
+  window.location.href = "dashboard.html";
+}
+
+async function cancelRequest(requestId) {
+
+  if (!confirm("Are you sure you want to cancel this ride?")) return;
+
+  // disable button instantly
+  document.getElementById(`cancel-${requestId}`)?.setAttribute("disabled", true);
+
+  try {
+
+    const response = await fetchWithAuth(
+      `https://aviro-production.up.railway.app/api/ride-requests/${requestId}/cancel`,
+      {
+        method: "PUT"
+      }
+    );
+
+    console.log("Status:", response.status);
+
+    if (!response.ok) {
+      const err = await response.text();
+      console.error(err);
+      alert("Failed to cancel ride");
+      return;
+    }
+
+    const data = await response.json();
+    console.log("Cancelled:", data);
+
+    alert("Ride cancelled successfully");
+
+    // refresh UI
+    loadMyRequests();
+
+  } catch (error) {
+    console.error(error);
+    alert("Error cancelling ride");
+  }
+}
+setInterval(() => {
+  loadMyRequests();
+}, 5000); // every 5 seconds
+// auto load
+loadMyRequests();
+
+</script>
+
+</body>
+</html>

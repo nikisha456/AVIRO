@@ -4,17 +4,18 @@ async function refreshAccessToken() {
   const refreshToken = localStorage.getItem("refreshToken");
 
   if (!refreshToken) {
-    return null; // ❌ no redirect here
+    return null; //  no redirect here
   }
 
   try {
     const response = await fetch("https://aviro-production.up.railway.app/api/auth/refresh", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+         "Refresh-Token": refreshToken
       },
       body: JSON.stringify({
-        refreshToken: refreshToken
+       
       })
     });
 
@@ -29,7 +30,7 @@ async function refreshAccessToken() {
 
   } catch (error) {
     console.error("Refresh Error:", error);
-    return null; // ❌ no redirect
+    return null; // no redirect
   }
 }
 
@@ -46,11 +47,11 @@ async function fetchWithAuth(url, options = {}) {
 
   let response = await fetch(url, options);
 
-  // 🔥 If unauthorized → try refresh
+  // If unauthorized → try refresh
   if (response.status === 403) {
     const newToken = await refreshAccessToken();
 
-    // ❌ If refresh failed → NOW redirect safely
+    // If refresh failed → NOW redirect safely
     if (!newToken) {
       alert("Session expired. Please login again.");
       localStorage.clear();

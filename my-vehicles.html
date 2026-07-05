@@ -75,25 +75,7 @@
   transform: scale(1.02);
 }
 
-/* DELETE BUTTON */
-.delete-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: linear-gradient(135deg, #ff416c, #ff4b2b);
-  border: none;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: 0.3s;
-}
 
-.delete-btn:hover {
-  transform: scale(1.1);
-  background: linear-gradient(135deg, #ff2a5a, #ff1e00);
-}
   </style>
 </head>
 
@@ -159,10 +141,10 @@ async function loadVehicles() {
   card.className = "vehicle-card";
 
  const vehicleId = v.id || v.vehicleId || (v.vehicle && v.vehicle.id);
+ console.log("Vehicle ID:", vehicleId);
 
 card.innerHTML = `
-  <button class="delete-btn" onclick="deleteVehicle('${vehicleId}')">Delete</button>
-
+  
   <h3>${v.type}</h3>
   <p><b>Reg No:</b> ${v.registrationNumber}</p>
   <p><b>Model:</b> ${v.model}</p>
@@ -171,7 +153,7 @@ card.innerHTML = `
 
   container.appendChild(card);
 });
-console.log("Vehicle ID:", vehicleId);
+
 
   } catch (error) {
     console.error(error);
@@ -186,48 +168,6 @@ function goBack() {
 // Load data when page opens
 loadVehicles();
 
-async function deleteVehicle(id) {
-  const token = localStorage.getItem("accessToken");
-
-  if (!id) {
-    alert("Invalid Vehicle ID");
-    return;
-  }
-
-  if (!confirm("Are you sure you want to delete this vehicle?")) return;
-
-  try {
-    const url = `https://aviro-production.up.railway.app/api/vehicles/${id}`;
-    console.log("DELETE URL:", url);
-
-    const response = await fetch(url, {
-      method: "DELETE",
-      headers: {
-        "Authorization": "Bearer " + token
-      }
-    });
-
-    console.log("Status:", response.status);
-
-    if (response.ok) {
-      alert("Vehicle deleted successfully");
-      loadVehicles();
-    } 
-    else if (response.status === 403) {
-      alert(" Not authorized (Driver role needed)");
-    }
-    else if (response.status === 404) {
-      alert(" Vehicle not found");
-    }
-    else {
-      alert(" Failed to delete vehicle");
-    }
-
-  } catch (error) {
-    console.error(error);
-    alert("Error deleting vehicle");
-  }
-}
 
 </script>
 

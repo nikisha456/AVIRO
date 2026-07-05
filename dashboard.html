@@ -42,7 +42,11 @@
   <div class="glass">
 
     <h2>Rides</h2>
-
+  <div class="btn-group">
+  <button class="btn neon-request-btn" onclick="window.location.href='my-requests.html'">
+    My Ride Requests
+  </button>
+</div>
     <!-- SCHEDULE RIDE -->
     <div class="ride-form">
       <h3>Schedule a Ride</h3>
@@ -56,7 +60,10 @@
       <input type="number" id="pricePerSeat" placeholder="Price per Seat">
       <div class="vehicle-box">
   <label>Enter Vehicle ID</label>
-  <input type="number" id="vehicleId" placeholder="e.g. 1">
+  <select id="vehicleId">
+  <option value="">Loading vehicles...</option>
+</select>
+ <!--  <input type="number" id="vehicleId" placeholder="e.g. 1">-->
 
   <small class="hint-text">
     Tip: Check your Vehicle ID from "My Vehicles" page
@@ -67,9 +74,7 @@
 
     <hr style="margin:25px 0; opacity:0.3;">
 
-    <!-- RIDE LIST -->
-    <h3>My Scheduled Rides</h3>
-    <div id="rideList"></div>
+    
 
   </div>
 </div>
@@ -87,7 +92,8 @@
   <div id="driver" class="section">
   <div class="glass">
     <h2>Drivers</h2>
-
+   <button class="btn neon-btn" onclick="window.location.href='received-requests.html'"> Ride Requests
+</button>
     <div class="btn-group">
       <a href="add-vehicle.html">
         <button class="btn primary-btn">+ Add Vehicle</button>
@@ -379,6 +385,32 @@ th {
   font-size: 11px;
   margin-top: 5px;
   color: rgba(255,255,255,0.5);
+}
+
+.neon-request-btn {
+  background: linear-gradient(135deg, #00f7ff, #5b86e5);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 10px rgba(0,247,255,0.6);
+  transition: all 0.3s ease;
+}
+
+/* HOVER EFFECT */
+.neon-request-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 0 18px rgba(0,247,255,0.9),
+              0 0 25px rgba(91,134,229,0.6);
+}
+
+/* CLICK EFFECT */
+.neon-request-btn:active {
+  transform: scale(0.95);
 }
 </style>
 
